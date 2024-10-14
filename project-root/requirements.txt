@@ -1,0 +1,37 @@
+Raspberry Pi Settings:
+    Enable SSH:
+        Raspberry Pi Configuration:
+            Interfaces:
+                SSH: Enable
+        Terminal: sudo systemctl enable ssh
+        Terminal: sudo systemctl start ssh
+    
+    Enable execution of the repository main() on boot:
+        Create the Service file on the Raspberry Pi:
+            Terminal: sudo nano /etc/systemd/system/Remote_GPIO.service
+            Ensure PYTHONPATH is Set: PYTHONPATH should include the src directory. You can set this in your service file.
+
+            Text Editor in Terminal: 
+                [Unit]
+                Description=Remote Access and Control Python Project
+                After=network.target
+
+                [Service]
+                Environment=PYTHONPATH=/home/administrator/projects/Remote_GPIO/repo/project-root/src
+                ExecStart=/usr/bin/python3 /home/administrator/projects/Remote_GPIO/repo/project-root/src/main.py
+                WorkingDirectory=/home/administrator/projects/Remote_GPIO/repo/project-root/src
+                StandardOutput=file:/var/log/Remote_GPIO.log
+                StandardError=file:/var/log/Remote_GPIO_error.log
+                Restart=always
+                User=administrator
+
+                [Install]
+                WantedBy=multi-user.target
+
+            Save and Exit: Ctrl + X, Y, Enter
+
+        Terminal: sudo systemctl daemon-reload --> Reload the service file
+        Terminal: sudo systemctl start Remote_GPIO --> Start the service
+        Terminal: sudo systemctl status Remote_GPIO --> Check the status of the service
+        Terminal: sudo systemctl enable Remote_GPIO --> Enable the service to start on boot
+

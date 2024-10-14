@@ -1,4 +1,4 @@
-from module import setup_gpio, syncGitOnButtonPush
+from GPIO_module.GPIOs import setup_gpio, syncGitOnButtonPush
 
 def main():
     setup_gpio()
