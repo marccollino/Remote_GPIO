@@ -35,3 +35,14 @@ Raspberry Pi Settings:
         Terminal: sudo systemctl status Remote_GPIO --> Check the status of the service
         Terminal: sudo systemctl enable Remote_GPIO --> Enable the service to start on boot
 
+    ###- Not useddue to missing acces permission Enable save spot on sdcard for data logging
+    ###- Not useddue to missing acces permission     Check if the SD card is mounted. You can list the mounted filesystems using:
+    ###- Not useddue to missing acces permission         Terminal: df -h
+    ###- Not useddue to missing acces permission     Create a mount point if it doesnt exist:
+    ###- Not useddue to missing acces permission         Terminal: sudo mkdir /mnt/sdcard
+    ###- Not useddue to missing acces permission     Mount the SD card (replace /dev/sdX1 with the actual device name of your SD card listed in the output of the df -h command):
+    ###- Not useddue to missing acces permission         Terminal: sudo mount /dev/sdX1 /mnt/sdcard
+    ###- Not useddue to missing acces permission     Create the 2folder on the sdcard, which will have writing permission:
+    ###- Not useddue to missing acces permission         Terminal: sudo mkdir -p /mnt/sdcard/accessableData
+    ###- Not useddue to missing acces permission     
+

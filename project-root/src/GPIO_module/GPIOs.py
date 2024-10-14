@@ -26,7 +26,7 @@ def setup_gpio():
 
 def syncGitOnButtonPush():
     # Path to the CSV file on the SD card
-    # csv_file_path = "/mnt/sdcard/accessableData/dataLog.csv"
+    csv_file_path = "/home/administrator/projects/Remote_GPIO/repo/project-root/logs/dataLog.csv"
 
     def blink_led(times, interval):
         for _ in range(times):
@@ -40,12 +40,12 @@ def syncGitOnButtonPush():
         # Restart the script
         os.execv(sys.executable, ['python3'] + sys.argv)
 
-    # def log_button_press(button_name):
-    #     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #     with open(csv_file_path, mode='a', newline='') as file:
-    #         writer = csv.writer(file)
-    #         writer.writerow([timestamp, button_name])
-    #     print(f"Logged {button_name} press at {timestamp}")
+    def log_button_press(button_name):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(csv_file_path, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([timestamp, button_name])
+        print(f"Logged {button_name} press at {timestamp}")
 
     try:
         # Blink the LED 5 times at the start
@@ -64,7 +64,7 @@ def syncGitOnButtonPush():
                     break
                 # If only the main button is pressed, pull from the main branch
                 print("Pulling from main branch...")
-                # log_button_press("Main")
+                log_button_press("Main")
                 pull_from_git('main')
                 time.sleep(1)  # Debounce delay
                 # Short blink to indicate the pull is complete
@@ -79,7 +79,7 @@ def syncGitOnButtonPush():
                     break
                 # If only the dev button is pressed, pull from the dev branch
                 print("Pulling from dev branch...")
-                # log_button_press("Dev")
+                log_button_press("Dev")
                 pull_from_git('dev')
                 time.sleep(1)  # Debounce delay
                 blink_led(2, 0.2)
