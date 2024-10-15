@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="flexContainer">
+    <h1>{{ pageTitle }}</h1>
+    <div class="subNavBarAction">
+    {% if g.user or g.admin %}
+      <script>
+        subNavBar = document.querySelector(".subNavBarAction");
+        returnPackage = createDefaultActionForm(subNavBar, "/", "Search", ["search"], "GET");
+        form = returnPackage[0];
+        form.id = "searchForm"
+        searchInput = document.createElement("input");
+        searchInput.type = "text";
+        searchInput.name = "searchQuery";
+        searchInput.placeholder = "Search...";
+        searchInput.style = "margin:0.3rem";
+        form.insertBefore(searchInput, form.firstChild);
+        if ("{{ searchQuery }}" != "" && "{{ searchQuery }}" != null && "{{ searchQuery }}" != "None") {
+          searchInput.placeholder = "{{ searchQuery }}";
+          searchInput.value = "{{ searchQuery }}";
+        }
+        
+        createDefaultActionForm(subNavBar, "/", "Upload", ["cloud-upload"]);
+      </script>
+    {% endif %}
+    {% if g.admin %}
+      <script>
+        subNavBar = document.querySelector(".subNavBarAction");
+        returnPackage = createDefaultActionForm(subNavBar, "/home.syncGit", "Pull from Git Origin Branch", ["logo-github","git-pull-request-outline"]);
+        formGitPull = returnPackage[0];
+        buttonGitPull = returnPackage[1];
+        console.log(formGitPull);
+        console.log(buttonGitPull);
+        buttonGitPull.addEventListener('click', function(event) {
+          event.preventDefault();
+          let branchName = prompt("Please enter the branch name:", "main");
+          if (branchName != null && branchName != "") {
+            createHiddenFormInput(formGitPull, "branchName", branchName);
+            formGitPull.submit();
+          }
+        });
+
+      </script>
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar">
+    <h2>Directory</h2>
+    <form id="directory" class="filterForm" action="{{ url_for('home.dashBoardViewer') }}" method="GET">
+      <input type="hidden" name="folderPath" value="your/folderPath">
+    </form>
+  </div>
+{% endblock %}
+
+{% block viewContent %}
+  <div class="mainContent">
+    
+  </div>
+  <script type="text/javascript">
+    // Variables from initial website load via Jinja Syntax
+    const liveDataHeaderJSON = '{{ liveDataHeaderJSON | tojson }}';
+    console.log(liveDataHeaderJSON);
+    liveDataHeaderBuffer = JSON.parse(liveDataHeaderJSON);
+    if (liveDataHeaderBuffer == null){
+      liveDataHeaderBuffer = [];
+    }
+    const liveDataHeader = liveDataHeaderBuffer;
+    console.log(liveDataHeader);
+    window.onload = function() {
+      for(var i = 0; i < liveDataHeader.length; i++){
+        loadLiveData(liveDataHeader[i]);
+      }
+    };
+
+    function loadLiveData(liveDataHeaderRow){
+      console.log(liveDataHeaderRow);
+      var mainListElement = document.createElement("div");
+      mainListElement.className = "listElement";
+      mainListElement.id = "listElement_" + liveDataHeaderRow;
+      document.querySelector(".mainContent").appendChild(mainListElement);
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', "{{ url_for('home.getLiveData') }}", true);
+      // Prepare FormData
+      var formData = new FormData();
+      formData.append('selectedLiveData', liveDataHeaderRow);
+      // Define the reaction on the server response
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var liveDataRow = JSON.parse(xhr.responseText);
+          mainListElement = document.getElementById("listElement_" + liveDataRow['id']);
+          var listElementContent = document.createElement("div");
+          listElementContent.className = "listElementContent";
+          mainListElement.appendChild(listElementContent);
+          var article = document.createElement("article");
+          article.className = "rowArticle";
+          listElementContent.appendChild(article);
+          var header = document.createElement("header");
+          article.appendChild(header);
+          header.innerText = liveDataRow['name'];
+
+          // Container for the Buttons
+          var listElementAction = document.createElement("div");
+          listElementAction.className = "listElementAction";
+          listElementAction.id = "listElementAction_" + liveDataRow['id'];
+          listElementAction.style.display = "none";
+          mainListElement.appendChild(listElementAction);
+
+          // TODO: Add a button to start measurement of the distance
+        }
+      }
+      // Send the request with formData
+      xhr.send(formData);
+    }
+
+  </script>
+{% endblock %}
+

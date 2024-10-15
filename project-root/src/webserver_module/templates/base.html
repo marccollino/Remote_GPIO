@@ -1,0 +1,93 @@
+<!-- The Base HTML will be the template that all other templates will extend from. -->
+<!-- Jinja (similar to Python) is used to dynamically generate HTML viewContent depending on the user's actions.-->
+<!-- There are following Jinja delimeters: {+%  for statements, {+{ for expressions, and {+# for comments. -->
+<!doctype html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js is a JavaScript library for creating charts. -->
+<script src="{{ url_for('static', filename='visualisationHelpers.js') }}"></script>
+
+<!-- The name block will be replaced by the viewContent from the other templates. -->
+<title>{% block name %}{% endblock %}{% if g.user %} Logged in as {{ g.user['name'] }}{% endif %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Raspberry Pi GPIO Server</h1>
+  <div>
+    <ul>
+      <li><a class='action' href="{{ url_for('home.dashBoardViewer', clearSession='true') }}"><ion-icon name="analytics"></ion-icon> Live Data</a></li>
+    </ul>
+  </div>
+  <div>
+    <ul>
+      <!-- The g object is a place to store and share data during the life of a request. -->
+      <!-- The HTML is manipulated depending on whether the user is logged in or not. -->
+      {% if g.user %}
+        {% if g.admin %}
+          <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Admin: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon><ion-icon name="medal-outline"></ion-icon></a>
+          <li><a class='action' href="{{ url_for('home.restartServer') }}" title="Restart Server"><ion-icon name="refresh-circle"></ion-icon><ion-icon name="medal-outline"></ion-icon></a>
+        {% else %}
+          <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Account: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon></a>
+        {% endif %}
+        <li><a class='action' href="{{ url_for('auth.logout') }}" title="Log Out"><ion-icon name="log-out"></ion-icon></a>
+      {% else %}
+        <li><a class='action' href="{{ url_for('auth.login') }}" title="Log In"><ion-icon name="log-in"></ion-icon></a>
+      {% endif %}
+      <li><a class='action' href="{{ url_for('home.shutdown') }}" title="Shutdown"><ion-icon name="power"></ion-icon></a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="fixedSubNavBar">
+  <!-- The header block will be replaced by the viewContent from the other templates. -->
+  {% block header %}{% endblock %}
+</div>
+<section class="viewContent subNavArea">
+  <!-- The get_flashed_messages() function will return any messages that have been flashed with the flash() function. -->
+  {% for message in get_flashed_messages(True) %}
+    {% if message[0] == 'instruction' %}
+      <div class="flash instruction">INSTRUCTION: <br>{{ message[1]|safe }}</div>
+    {% elif message[0] == 'error' %}
+      <div class="flash error">ERROR: <br>{{ message[1]|safe }}</div>
+    {% else %}
+      <div class="flash">INFO: <br>{{ message[1]|safe }}</div>
+    {% endif %}
+  {% endfor %}
+  <div class="flexContainer">
+      <!-- The sidebar block will be replaced by the viewContent from the other templates. -->
+      {% block sidebar %}{% endblock %}
+      <!-- The content block will be replaced by the viewContent from the other templates. -->
+      {% block viewContent %}{% endblock %}
+  </div>
+</section>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Get the nav element and the div with class 'fixedSubNavBar'
+    var navBar = document.querySelector('nav');
+    var subNavBar = document.querySelector('.fixedSubNavBar');
+    var subNavArea = document.querySelector('.subNavArea');
+
+    // Calculate the height of the nav bar
+    var navBarHeight = navBar.offsetHeight;
+    var subNavBarHeight = subNavBar.offsetHeight;
+
+    // Set the top property of the subNavBar to be directly below the nav bar
+    subNavBar.style.top = navBarHeight + 'px';
+    topBarThickness = navBarHeight + subNavBarHeight;
+    subNavArea.style.marginTop = topBarThickness + 'px';
+
+    // Resize event listener
+    window.addEventListener('resize', function() {
+      navBarHeight = navBar.offsetHeight;
+      subNavBarHeight = subNavBar.offsetHeight;
+      topBarThickness = navBarHeight + subNavBarHeight;
+      subNavBar.style.top = navBarHeight + 'px';
+      subNavArea.style.marginTop = topBarThickness + 'px';
+    });
+  });
+</script>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
