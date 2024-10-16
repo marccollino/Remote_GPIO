@@ -1,52 +1,5 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <div class="flexContainer">
-    <h1>{{ pageTitle }}</h1>
-    <div class="subNavBarAction">
-    {% if g.user or g.admin %}
-      <script>
-        subNavBar = document.querySelector(".subNavBarAction");
-        returnPackage = createDefaultActionForm(subNavBar, "/", "Search", ["search"], "GET");
-        form = returnPackage[0];
-        form.id = "searchForm"
-        searchInput = document.createElement("input");
-        searchInput.type = "text";
-        searchInput.name = "searchQuery";
-        searchInput.placeholder = "Search...";
-        searchInput.style = "margin:0.3rem";
-        form.insertBefore(searchInput, form.firstChild);
-        if ("{{ searchQuery }}" != "" && "{{ searchQuery }}" != null && "{{ searchQuery }}" != "None") {
-          searchInput.placeholder = "{{ searchQuery }}";
-          searchInput.value = "{{ searchQuery }}";
-        }
-        
-        createDefaultActionForm(subNavBar, "/", "Upload", ["cloud-upload"]);
-      </script>
-    {% endif %}
-    {% if g.admin %}
-      <script>
-        subNavBar = document.querySelector(".subNavBarAction");
-        returnPackage = createDefaultActionForm(subNavBar, "/home.syncGit", "Pull from Git Origin Branch", ["logo-github","git-pull-request-outline"]);
-        formGitPull = returnPackage[0];
-        buttonGitPull = returnPackage[1];
-        console.log(formGitPull);
-        console.log(buttonGitPull);
-        buttonGitPull.addEventListener('click', function(event) {
-          event.preventDefault();
-          let branchName = prompt("Please enter the branch name:", "main");
-          if (branchName != null && branchName != "") {
-            createHiddenFormInput(formGitPull, "branchName", branchName);
-            formGitPull.submit();
-          }
-        });
-
-      </script>
-    {% endif %}
-    </div>
-  </div>
-{% endblock %}
-
 {% block sidebar %}
   <div class="sidebar">
     <h2>Directory</h2>
@@ -63,13 +16,11 @@
   <script type="text/javascript">
     // Variables from initial website load via Jinja Syntax
     const liveDataHeaderJSON = '{{ liveDataHeaderJSON | tojson }}';
-    console.log(liveDataHeaderJSON);
     liveDataHeaderBuffer = JSON.parse(liveDataHeaderJSON);
     if (liveDataHeaderBuffer == null){
       liveDataHeaderBuffer = [];
     }
     const liveDataHeader = liveDataHeaderBuffer;
-    console.log(liveDataHeader);
     window.onload = function() {
       for(var i = 0; i < liveDataHeader.length; i++){
         loadLiveData(liveDataHeader[i]);
@@ -77,7 +28,6 @@
     };
 
     function loadLiveData(liveDataHeaderRow){
-      console.log(liveDataHeaderRow);
       var mainListElement = document.createElement("div");
       mainListElement.className = "listElement";
       mainListElement.id = "listElement_" + liveDataHeaderRow;
@@ -101,15 +51,44 @@
           var header = document.createElement("header");
           article.appendChild(header);
           header.innerText = liveDataRow['name'];
+          var p = document.createElement("p");
+          p.id = "liveData_"+liveDataRow['id'];
+          p.innerText = 'No value';
+          article.appendChild(p);
 
           // Container for the Buttons
           var listElementAction = document.createElement("div");
           listElementAction.className = "listElementAction";
           listElementAction.id = "listElementAction_" + liveDataRow['id'];
-          listElementAction.style.display = "none";
           mainListElement.appendChild(listElementAction);
 
-          // TODO: Add a button to start measurement of the distance
+          if(liveDataRow['id'] == 1){
+            // Add a button to start measurement of the distance
+            var buttonStart = document.createElement("button");
+            buttonStart.className = "button";
+            buttonStart.innerText = "Start Measurement";
+            buttonStart.id = "buttonStart_" + liveDataRow['id'];
+            buttonStart.classList.add("action");
+            listElementAction.appendChild(buttonStart);
+            buttonStart.addEventListener('click', function(event) {
+              // AJAX Request to start the measurement and write the response in the listElementContent
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', "{{ url_for('home.distanceMeasurement') }}", true);
+              // Prepare FormData
+              var formData = new FormData();
+              // Define the reaction on the server response
+              xhr.onload = function() {
+                if (xhr.status === 200) {
+                  var distance = JSON.parse(xhr.responseText);
+                  var p = document.getElementById("liveData_1");
+                  p.innerText = distance + " mm";
+                }
+              }
+              // Send the request with formData
+              xhr.send(formData);
+
+            });
+          }
         }
       }
       // Send the request with formData

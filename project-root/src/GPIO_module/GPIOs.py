@@ -5,6 +5,9 @@ import time
 ULTRASONIC_TRIGGER_PIN = 23
 ULTRASONIC_ECHO_PIN = 24
 
+# # Disable warnings regarding GPIO usage
+# GPIO.setwarnings(False)
+
 def setup_gpio():
     # Set up the GPIO pins
     GPIO.setmode(GPIO.BCM)
@@ -15,7 +18,7 @@ def setup_gpio():
 
 def getDistanceFromSonic():
     try:
-        returnPackage = {'data': 9999, 'error':''}
+        returnPackage = {'data': 9999, 'error': None}
 
         # setze Trigger auf HIGH
         GPIO.output(ULTRASONIC_TRIGGER_PIN, True)
@@ -30,6 +33,7 @@ def getDistanceFromSonic():
         # speichere Startzeit
         while GPIO.input(ULTRASONIC_ECHO_PIN) == 0:
             startTime = time.time()
+            
     
         # speichere Ankunftszeit
         while GPIO.input(ULTRASONIC_ECHO_PIN) == 1:
@@ -37,9 +41,9 @@ def getDistanceFromSonic():
     
         # Zeit Differenz zwischen Start und Ankunft
         TimeElapsed = stopTime - startTime
-        # mit der Schallgeschwindigkeit (343000 mm/s) multiplizieren
+        # mit der Schallgeschwindigkeit (343200 mm/s) multiplizieren
         # und durch 2 teilen, da hin und zurueck
-        distance = (TimeElapsed * 343000) / 2
+        distance = (TimeElapsed * 343200) / 2
         returnPackage['data'] = distance
 
     except Exception as e:

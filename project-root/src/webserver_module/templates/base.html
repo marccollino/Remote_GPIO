@@ -12,36 +12,64 @@
 <title>{% block name %}{% endblock %}{% if g.user %} Logged in as {{ g.user['name'] }}{% endif %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Raspberry Pi GPIO Server</h1>
-  <div>
+  <div class="nav-left">
+    <h1>Raspberry Pi GPIO Server</h1>
+  </div>
+  <div class="nav-middle">
     <ul>
-      <li><a class='action' href="{{ url_for('home.dashBoardViewer', clearSession='true') }}"><ion-icon name="analytics"></ion-icon> Live Data</a></li>
     </ul>
   </div>
-  <div>
+  <div class="nav-right">
     <ul>
-      <!-- The g object is a place to store and share data during the life of a request. -->
-      <!-- The HTML is manipulated depending on whether the user is logged in or not. -->
+      <li><a class='action' href="{{ url_for('home.dashBoardViewer', clearSession='true') }}" title="Dashboard"><ion-icon name="stats-chart"></ion-icon> </a></li>
       {% if g.user %}
+        <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Account: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon></a></li>
+        <li><a class='action' href="{{ url_for('auth.logout') }}" title="Log Out"><ion-icon name="log-out-outline"></ion-icon></a></li>
         {% if g.admin %}
-          <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Admin: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon><ion-icon name="medal-outline"></ion-icon></a>
-          <li><a class='action' href="{{ url_for('home.restartServer') }}" title="Restart Server"><ion-icon name="refresh-circle"></ion-icon><ion-icon name="medal-outline"></ion-icon></a>
-        {% else %}
-          <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Account: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon></a>
+          <li><a class='action' href="{{ url_for('home.restartServer') }}" title="Restart Server"><ion-icon name="refresh-outline"></ion-icon></a></li>
+          <li><a id='gitButton' class='action' href="{{ url_for('home.syncGit') }}" title="Pull from Git Origin Branch"><ion-icon name="logo-github"></ion-icon><ion-icon name="git-pull-request-outline"></ion-icon></a></li>
         {% endif %}
-        <li><a class='action' href="{{ url_for('auth.logout') }}" title="Log Out"><ion-icon name="log-out"></ion-icon></a>
       {% else %}
-        <li><a class='action' href="{{ url_for('auth.login') }}" title="Log In"><ion-icon name="log-in"></ion-icon></a>
+        <li><a class='action' href="{{ url_for('auth.login') }}" title="Log In"><ion-icon name="log-in-outline"></ion-icon></a></li>
       {% endif %}
       <li><a class='action' href="{{ url_for('home.shutdown') }}" title="Shutdown"><ion-icon name="power"></ion-icon></a></li>
     </ul>
   </div>
 </nav>
 
-<div class="fixedSubNavBar">
-  <!-- The header block will be replaced by the viewContent from the other templates. -->
-  {% block header %}{% endblock %}
-</div>
+<script>
+  navBar = document.querySelector(".nav-middle");
+  returnPackage = createDefaultActionForm(navBar, "/", "Search", ["search"], "GET");
+  form = returnPackage[0];
+  form.id = "searchForm"
+  searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.name = "searchQuery";
+  searchInput.placeholder = "Search...";
+  searchInput.style = "margin:0.3rem";
+  form.insertBefore(searchInput, form.firstChild);
+  if ("{{ searchQuery }}" != "" && "{{ searchQuery }}" != null && "{{ searchQuery }}" != "None") {
+    searchInput.placeholder = "{{ searchQuery }}";
+    searchInput.value = "{{ searchQuery }}";
+  }
+  
+</script>
+
+{% if g.admin %}
+<script>
+  var buttonGitPull = document.getElementById('gitButton');
+  buttonGitPull.addEventListener('click', function(event) {
+    event.preventDefault();
+    let branchName = prompt("Please enter the branch name:", "main");
+    if (branchName != null && branchName != "") {
+      createHiddenFormInput(formGitPull, "branchName", branchName);
+      formGitPull.submit();
+    }
+  });
+
+</script>
+{% endif %}
+
 <section class="viewContent subNavArea">
   <!-- The get_flashed_messages() function will return any messages that have been flashed with the flash() function. -->
   {% for message in get_flashed_messages(True) %}
@@ -63,30 +91,25 @@
 
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
+  function adjustSubNavAreaMargin() {
     // Get the nav element and the div with class 'fixedSubNavBar'
     var navBar = document.querySelector('nav');
-    var subNavBar = document.querySelector('.fixedSubNavBar');
     var subNavArea = document.querySelector('.subNavArea');
 
     // Calculate the height of the nav bar
     var navBarHeight = navBar.offsetHeight;
-    var subNavBarHeight = subNavBar.offsetHeight;
 
-    // Set the top property of the subNavBar to be directly below the nav bar
-    subNavBar.style.top = navBarHeight + 'px';
-    topBarThickness = navBarHeight + subNavBarHeight;
-    subNavArea.style.marginTop = topBarThickness + 'px';
+    // Set the top property to be directly below the nav bar
+    subNavArea.style.marginTop = navBarHeight + 'px';
+  }
 
-    // Resize event listener
-    window.addEventListener('resize', function() {
-      navBarHeight = navBar.offsetHeight;
-      subNavBarHeight = subNavBar.offsetHeight;
-      topBarThickness = navBarHeight + subNavBarHeight;
-      subNavBar.style.top = navBarHeight + 'px';
-      subNavArea.style.marginTop = topBarThickness + 'px';
-    });
+  // Adjust margin on window load
+  window.addEventListener('load', function() {
+    setTimeout(adjustSubNavAreaMargin, 100);
   });
+
+  // Adjust margin on window resize
+  window.addEventListener('resize', adjustSubNavAreaMargin);
 </script>
 
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

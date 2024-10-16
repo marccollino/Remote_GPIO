@@ -2,7 +2,7 @@ import os
 import sys
 
 def pullFromGit(branch):
-    returnPackage = {'error': ''}
+    returnPackage = {'error': None}
     try:
         os.system(f'git pull origin {branch}')
         # Restart the script

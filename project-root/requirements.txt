@@ -17,13 +17,14 @@ Raspberry Pi Settings:
                 After=network.target
 
                 [Service]
+                ExecStartPre=/bin/bash -c 'if lsof -i:5000; then fuser -k 5000/tcp; fi'
                 Environment=PYTHONPATH=/home/administrator/projects/Remote_GPIO/repo/project-root/src
                 ExecStart=/usr/bin/python3 /home/administrator/projects/Remote_GPIO/repo/project-root/src/main.py
                 WorkingDirectory=/home/administrator/projects/Remote_GPIO/repo/project-root/src
                 StandardOutput=file:/var/log/Remote_GPIO.log
                 StandardError=file:/var/log/Remote_GPIO_error.log
-                Restart=always
                 User=administrator
+                ExecStop=/bin/kill -s SIGTERM $MAINPID
 
                 [Install]
                 WantedBy=multi-user.target

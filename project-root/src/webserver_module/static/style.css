@@ -9,11 +9,11 @@ html, body {
     color: var(--text-color);
 }
 html {
-    background: white;
+    background: rgb(247, 247, 247);
 }
 
 ion-icon {
-    font-size: 1.4em;
+    font-size: 1.7em;
     font-weight: bold;
     vertical-align: middle;
 }
@@ -46,10 +46,9 @@ hr {
 }
 
 nav {
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    background: white;
     display: flex;
     align-items: center;
-    padding: 0 0.5rem;
     position: fixed;
     top: 0;
     left: 0;
@@ -57,16 +56,12 @@ nav {
     z-index: 999;
 }
 
-nav h1 {
-    flex: auto;
-    margin: 0;
-    color: white;
-}
-
-nav h1 a {
-    text-decoration: none;
-    padding: 0.25rem 0.5rem;
-    color: white;
+nav h1{
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for browsers that do not support background-clip */
 }
 
 nav ul {
@@ -83,30 +78,19 @@ nav ul li span {
     color: white;
 }
 
+.nav-left{
+    margin-left: auto;
+}
+.nav-middle{
+    margin-left: auto;
+    margin-right: auto;
+}
+.nav-right{
+    margin-right: auto;
+}
+
 input[type="text"]{
     width: 400px;
-}
-
-.fixedSubNavBar {
-    background: white;
-    position: fixed;
-    padding: 0.5rem;
-    top: 3.5rem;
-    left: 0;
-    right: 0;
-    z-index: 999;
-}
-
-.subNavArea {
-    padding-top: 0.1rem;
-}
-
-.subNavBarAction{
-    display: flex;
-    flex: 10%;
-    flex-wrap: wrap;    
-    justify-content: flex-end;
-    min-width: 150px;
 }
 
 .sidebar {
@@ -115,7 +99,7 @@ input[type="text"]{
     background-color: white;
     border-radius: 0.3rem;
     padding: 0.5rem;
-    box-shadow: 0.2rem 0.2rem 0.6rem lightgrey;
+    box-shadow: 0.2rem 0.2rem 0.3rem rgb(225, 225, 225);
 }
 
 .filterCategory {
@@ -140,7 +124,7 @@ input[type="text"]{
     background-color: white;
     border-radius: 0.3rem;
     padding: 0.5rem;
-    box-shadow: 0.2rem 0.2rem 0.6rem lightgrey;
+    box-shadow: 0.2rem 0.2rem 0.3rem rgb(225, 225, 225);
 }
 
 .flexContainer {
@@ -155,11 +139,7 @@ input[type="text"]{
     margin: 0.5rem 0;
     background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0.2rem 0.2rem 0.6rem lightgrey;
-}
-
-.graphicalVisualisation {
-    margin: 0 3rem;
+    box-shadow: 0.2rem 0.2rem 0.3rem rgb(225, 225, 225);
 }
 
 .listElementAction {
@@ -168,23 +148,6 @@ input[type="text"]{
     flex-wrap: wrap;    
     justify-content: flex-end;
     min-width: 150px;
-}
-
-.rankingScoreBar {
-    background-color: var(--dark-green);
-    margin: 0.1em 0 0.1em 0;
-    color: white;
-}
-
-.rankingScoreReferenceBar {
-    background-color: white;
-    margin: 0 0.3rem 0 0;
-    border-right: var(--dark-green) 2px solid;
-}
-
-.rankingScoreBarText {
-    color: var(--dark-green);
-    font-size: 0.7em;
 }
 
 .about {
@@ -214,12 +177,10 @@ input[type="text"]{
 
 .action {
     display: block;
-    max-height: 2rem;
-    padding: 0.3rem 0.4rem;
-    margin: 0.3rem;
-    color: white;
+    padding: 0.7rem 0.4rem;
+    color: var(--primary-color);
     font-weight: bold;
-    background: var(--secondary-color);
+    background: white;
     cursor: pointer;
     border: none;
     border-radius: 0.2rem;
@@ -227,6 +188,7 @@ input[type="text"]{
 
 .action:hover {
     background: var(--primary-color);
+    color: white;
 }
 
 .viewContent {
@@ -278,17 +240,17 @@ input[type="text"]{
     background: white;
     border-radius: 0.5rem;
     font-weight: bold;
-    box-shadow: 0.2rem 0.2rem 0.6rem var(--primary-color);
+    box-shadow: 0.2rem 0.2rem 0.3rem var(--primary-color);
     color: var(--primary-color)
 }
 
 .flash.error {
-    box-shadow: 0.2rem 0.2rem 0.6rem var(--secondary-color);
+    box-shadow: 0.2rem 0.2rem 0.3rem var(--secondary-color);
     color: var(--secondary-color);
 }
 
 .flash.instruction {
-    box-shadow: 0.2rem 0.2rem 0.6rem var(--dark-green);
+    box-shadow: 0.2rem 0.2rem 0.3rem var(--dark-green);
     color: var(--dark-green);
 }   
 
