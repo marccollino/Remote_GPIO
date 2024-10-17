@@ -66,11 +66,15 @@
             // Add a button to start measurement of the distance
             var buttonStart = document.createElement("button");
             buttonStart.className = "button";
-            buttonStart.innerText = "Start Measurement";
+            buttonStart.innerHTML = '<ion-icon name="pulse-outline"></ion-icon> Start Measurement';
             buttonStart.id = "buttonStart_" + liveDataRow['id'];
             buttonStart.classList.add("action");
             listElementAction.appendChild(buttonStart);
             buttonStart.addEventListener('click', function(event) {
+              var measuredValueElement = document.getElementById("liveData_1");
+              measuredValueElement.innerHTML = "<ion-icon name='hourglass-outline'></ion-icon>";
+              // Disable the button
+              buttonStart.disabled = true;
               // AJAX Request to start the measurement and write the response in the listElementContent
               var xhr = new XMLHttpRequest();
               xhr.open('POST', "{{ url_for('home.distanceMeasurement') }}", true);
@@ -80,8 +84,9 @@
               xhr.onload = function() {
                 if (xhr.status === 200) {
                   var distance = JSON.parse(xhr.responseText);
-                  var p = document.getElementById("liveData_1");
-                  p.innerText = distance + " mm";
+                  measuredValueElement.innerHTML = distance + " mm";
+                  // Enable the button
+                  buttonStart.disabled = false;
                 }
               }
               // Send the request with formData

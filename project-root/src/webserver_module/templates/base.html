@@ -81,12 +81,10 @@
       <div class="flash">INFO: <br>{{ message[1]|safe }}</div>
     {% endif %}
   {% endfor %}
-  <div class="flexContainer">
-      <!-- The sidebar block will be replaced by the viewContent from the other templates. -->
-      {% block sidebar %}{% endblock %}
-      <!-- The content block will be replaced by the viewContent from the other templates. -->
-      {% block viewContent %}{% endblock %}
-  </div>
+
+  {% block sidebar %}{% endblock %}
+  <!-- The content block will be replaced by the viewContent from the other templates. -->
+  {% block viewContent %}{% endblock %}
 </section>
 
 
@@ -98,9 +96,19 @@
 
     // Calculate the height of the nav bar
     var navBarHeight = navBar.offsetHeight;
+    topBarThickness = navBarHeight;
 
     // Set the top property to be directly below the nav bar
-    subNavArea.style.marginTop = navBarHeight + 'px';
+    subNavArea.style.marginTop = (topBarThickness + 20) +  'px';
+
+    // Check if there is a sidebar and adjust the positions
+    var sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      sideBarPositionTop = topBarThickness + 10;
+      sidebar.style.top = sideBarPositionTop + 'px';
+      var mainContent = document.querySelector('.mainContent');
+      mainContent.style.marginLeft = (sidebar.offsetWidth + 20) + 'px';
+    }
   }
 
   // Adjust margin on window load
