@@ -6,12 +6,25 @@
 
 {% block viewContent %}
 <div class="mainContent">
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <button class="action" type="submit"><ion-icon name="log-in-outline"></ion-icon> Log In</button>
-  </form>
+  <div class="logInForm">
+    <form method="post">
+      <table>
+      <tr>
+        <td><label for="username">Username</label></td>
+        <td><input name="username" id="username" required></td>
+      </tr>
+      <tr>
+        <td><label for="password">Password</label></td>
+        <td><input type="password" name="password" id="password" required></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2" style="text-align: center;">
+        <button class="action" type="submit"><ion-icon name="log-in-outline"></ion-icon> Login</button>
+        </td>
+      </tr>
+      </table>
+    </form>
+  </div>
 </div>
 {% endblock %}

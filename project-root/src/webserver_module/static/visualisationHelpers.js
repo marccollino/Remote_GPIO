@@ -1,25 +1,25 @@
 
-function createDefaultActionForm(parentElement, route, buttonTitle, buttonIcon, method="POST"){
-    var form = document.createElement("form");
-    form.className = "actionForm";
-    form.action = route;
-    form.method = method;
-    parentElement.appendChild(form);
-    var button = document.createElement("button");
-    button.type = "submit";
-    button.className = "action";
-    button.title = buttonTitle;
-    // Check if buttonIcon is an array
-    if (!Array.isArray(buttonIcon)){
-      buttonIcon = [buttonIcon];  // Convert to array, so that it wont be read as string
-    }
-    for (var i = 0; i < buttonIcon.length; i++){
-      button.innerHTML += "<ion-icon name='" + buttonIcon[i] + "'></ion-icon>";
-    }
-    form.appendChild(button);
-    returnPackage = [form, button];
-    return returnPackage;
+
+function createDefaultActionForm(parentElement, route, buttonTitle, buttonIcon, buttonClass, method="POST"){
+  var form = document.createElement("form");
+  form.className = "actionForm";
+  form.action = route;
+  form.method = method;
+  parentElement.appendChild(form);
+  var button = document.createElement("button");
+  button.type = "submit";
+  button.className = buttonClass;
+  button.title = buttonTitle;
+  // Check if buttonIcon is an array
+  if (!Array.isArray(buttonIcon)){
+    buttonIcon = [buttonIcon];  // Convert to array, so that it wont be read as string
   }
+  for (var i = 0; i < buttonIcon.length; i++){
+    button.innerHTML += "<ion-icon name='" + buttonIcon[i] + "'></ion-icon>";
+  }
+  form.appendChild(button);
+  return [form, button];
+}
 
 function createHiddenFormInput(form, name, value){
     var input = document.createElement("input");

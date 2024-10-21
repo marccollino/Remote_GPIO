@@ -13,41 +13,36 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
   <div class="nav-left">
-    <h1>Raspberry Pi GPIO Server</h1>
+    <h1 class="pageTitle">Raspberry Pi GPIO Server</h1>
   </div>
-  <div class="nav-middle">
-    <ul>
-    </ul>
+  <div class="nav-middle flexContainer">
   </div>
   <div class="nav-right">
-    <ul>
-      <li><a class='action' href="{{ url_for('home.dashBoardViewer', clearSession='true') }}" title="Dashboard"><ion-icon name="stats-chart"></ion-icon> </a></li>
+      <a class='actionTopBar' href="{{ url_for('home.dashBoardViewer', clearSession='true') }}" title="Dashboard"><ion-icon name="stats-chart"></ion-icon> </a>
       {% if g.user %}
-        <li><a class='action' href="{{ url_for('home.dashBoardViewer') }}" title="Account: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon></a></li>
-        <li><a class='action' href="{{ url_for('auth.logout') }}" title="Log Out"><ion-icon name="log-out-outline"></ion-icon></a></li>
+        <a class='actionTopBar' href="{{ url_for('home.dashBoardViewer') }}" title="Account: {{ g.user['name'] }}"><ion-icon name="person-circle"></ion-icon></a>
+        <a class='actionTopBar' href="{{ url_for('auth.logout') }}" title="Log Out"><ion-icon name="log-out-outline"></ion-icon></a>
         {% if g.admin %}
-          <li><a class='action' href="{{ url_for('home.restartServer') }}" title="Restart Server"><ion-icon name="refresh-outline"></ion-icon></a></li>
-          <li><a id='gitButton' class='action' href="{{ url_for('home.syncGit') }}" title="Pull from Git Origin Branch"><ion-icon name="logo-github"></ion-icon><ion-icon name="git-pull-request-outline"></ion-icon></a></li>
+          <a class='actionTopBar' href="{{ url_for('home.restartServer') }}" title="Restart Server"><ion-icon name="refresh-outline"></ion-icon></a>
+          <a id='gitButton' class='actionTopBar' href="{{ url_for('home.syncGit') }}" title="Pull from Git Origin Branch"><ion-icon name="logo-github"></ion-icon><ion-icon name="git-pull-request-outline"></ion-icon></a>
         {% endif %}
       {% else %}
-        <li><a class='action' href="{{ url_for('auth.login') }}" title="Log In"><ion-icon name="log-in-outline"></ion-icon></a></li>
+        <a class='actionTopBar' href="{{ url_for('auth.login') }}" title="Log In"><ion-icon name="log-in-outline"></ion-icon></a>
       {% endif %}
-      <li><a class='action' href="{{ url_for('home.shutdown') }}" title="Shutdown"><ion-icon name="power"></ion-icon></a></li>
-    </ul>
+      <a class='actionTopBar' href="{{ url_for('home.shutdown') }}" title="Shutdown"><ion-icon name="power"></ion-icon></a>
   </div>
 </nav>
 
 <script>
   navBar = document.querySelector(".nav-middle");
-  returnPackage = createDefaultActionForm(navBar, "/", "Search", ["search"], "GET");
-  form = returnPackage[0];
-  form.id = "searchForm"
+  [searchForm, searchButton] = createDefaultActionForm(navBar, "/", "Search", ["search"], "actionTopBar", "GET");
+  searchForm.id = "searchForm"
   searchInput = document.createElement("input");
   searchInput.type = "text";
   searchInput.name = "searchQuery";
   searchInput.placeholder = "Search...";
   searchInput.style = "margin:0.3rem";
-  form.insertBefore(searchInput, form.firstChild);
+  searchForm.insertBefore(searchInput, searchForm.firstChild);
   if ("{{ searchQuery }}" != "" && "{{ searchQuery }}" != null && "{{ searchQuery }}" != "None") {
     searchInput.placeholder = "{{ searchQuery }}";
     searchInput.value = "{{ searchQuery }}";
@@ -89,7 +84,7 @@
 
 
 <script>
-  function adjustSubNavAreaMargin() {
+  function adjustPositionsAndStuff() {
     // Get the nav element and the div with class 'fixedSubNavBar'
     var navBar = document.querySelector('nav');
     var subNavArea = document.querySelector('.subNavArea');
@@ -101,6 +96,12 @@
     // Set the top property to be directly below the nav bar
     subNavArea.style.marginTop = (topBarThickness + 20) +  'px';
 
+    var topBarLinks = navBar.querySelectorAll('.actionTopBar');
+    topBarLinks.forEach(function(link) {
+      link.style.height = navBarHeight + 'px';
+      link.style.lineHeight = navBarHeight + 'px';
+    });
+
     // Check if there is a sidebar and adjust the positions
     var sidebar = document.querySelector('.sidebar');
     if (sidebar) {
@@ -108,16 +109,20 @@
       sidebar.style.top = sideBarPositionTop + 'px';
       var mainContent = document.querySelector('.mainContent');
       mainContent.style.marginLeft = (sidebar.offsetWidth + 20) + 'px';
+      var flashMessages = document.querySelectorAll('.flash');
+      for (var i = 0; i < flashMessages.length; i++) {
+        flashMessages[i].style.marginLeft = (sidebar.offsetWidth + 20) + 'px';
+      }
     }
   }
 
   // Adjust margin on window load
   window.addEventListener('load', function() {
-    setTimeout(adjustSubNavAreaMargin, 100);
+    setTimeout(adjustPositionsAndStuff, 100);
   });
 
   // Adjust margin on window resize
-  window.addEventListener('resize', adjustSubNavAreaMargin);
+  window.addEventListener('resize', adjustPositionsAndStuff);
 </script>
 
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

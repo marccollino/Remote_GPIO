@@ -10,11 +10,11 @@ html, body {
     color: var(--text-color);
 }
 html {
-    background: rgb(247, 247, 247);
+    background: var(--background-color);
 }
 
 ion-icon {
-    font-size: 1.7em;
+    font-size: 1.4em;
     font-weight: bold;
     vertical-align: middle;
 }
@@ -41,6 +41,33 @@ p {
     margin: 0.2rem 1rem 0.2rem 0.2rem;
 }
 
+input {
+    margin: 0;
+    max-height: 2rem;
+    min-height: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid lightgray
+}
+
+input:hover {
+    box-shadow: var(--shadow);
+    border-radius: 4px;
+    border: 1px solid grey;
+}
+
+select {
+    margin: 0;
+    max-height: 2rem;
+    min-height: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid lightgray
+}
+select:hover {
+    box-shadow: var(--shadow);
+    border-radius: 4px;
+    border: 1px solid grey;
+}
+
 hr {
     border: none;
     border-top: 1px solid lightgray;
@@ -50,17 +77,18 @@ nav {
     background: white;
     display: flex;
     align-items: center;
-    position: fixed;
     padding: 0 1rem;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 999;
-    box-shadow: var(--shadow);
+    min-height: 3rem;
 }
 
-nav h1{
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+.pageTitle {
+    font-size: 1.7em;
+    background: linear-gradient(to left, var(--primary-color), var(--secondary-color));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -90,10 +118,44 @@ nav ul li span {
 }
 .nav-right{
     margin-right: 0;
+    display: flex;
 }
 
 input[type="text"]{
     width: 400px;
+}
+
+.fixedNavSeparation {
+    height: 4px;
+    min-height: 4px;
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: linear-gradient(to left, var(--primary-color), var(--secondary-color));
+}
+
+.fixedSubNavBar {
+    background: white;
+    position: fixed;
+    padding: 0 1rem;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    box-shadow: var(--shadow);
+}
+
+.subNavArea {
+    justify-content: center;
+    padding-top: 1rem;
+}
+
+.subNavBarAction{
+    display: flex;
+    flex: 10%;
+    flex-wrap: wrap;    
 }
 
 .sidebar {
@@ -142,6 +204,10 @@ input[type="text"]{
     box-shadow: var(--shadow);
 }
 
+.inputContainer:hover {
+    border: 1px solid grey
+}
+
 .flexContainer {
     display: flex;
     flex-wrap: wrap;
@@ -151,10 +217,18 @@ input[type="text"]{
     display: flex;
     flex: 80%;
     padding: 0.4rem;
-    margin: 0.5rem 0;
+    margin-bottom: 0.5rem;
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: var(--shadow);
+}
+
+.listElement:hover {
+    border: 1px solid grey
+}
+
+.graphicalVisualisation {
+    margin: 1rem 0 0 1rem;
 }
 
 .listElementAction {
@@ -162,7 +236,23 @@ input[type="text"]{
     flex: 10%;
     flex-wrap: wrap;    
     justify-content: flex-end;
-    min-width: 150px;
+}
+
+.rankingScoreBar {
+    background-color: var(--dark-green);
+    margin: 0.1em 0 0.1em 0;
+    color: white;
+}
+
+.rankingScoreReferenceBar {
+    background-color: white;
+    margin: 0 0.3rem 0 0;
+    border-right: var(--dark-green) 2px solid;
+}
+
+.rankingScoreBarText {
+    color: var(--dark-green);
+    font-size: 0.7em;
 }
 
 .about {
@@ -190,6 +280,13 @@ input[type="text"]{
     justify-content: flex-end;
 }
 
+.logInForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
 .action {
     display: block;
     max-height: 2rem;
@@ -203,6 +300,22 @@ input[type="text"]{
 }
 
 .action:hover {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.actionTopBar {
+    display: block;
+    color: var(--primary-color);
+    font-weight: bold;
+    background: white;
+    cursor: pointer;
+    border: none;
+    align-items: center;
+    padding: 0 0.6rem;
+}
+
+.actionTopBar:hover {
     background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
     color: white;
 }
@@ -297,30 +410,7 @@ input[type="text"]{
     margin-bottom: 0.5em;
 }
 
-.viewContent input,
-.viewContent textarea {
-    margin-bottom: 1em;
-}
-
 .viewContent textarea {
     min-height: 12em;
     resize: vertical;
-}
-
-input.danger {
-    color: #cc2f2e;
-}
-
-input[type=submit] {
-    align-self: start;
-    min-width: 10em;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.5em 1em;
-    cursor: pointer;
-}
-
-input[type=submit]:hover {
-    background: var(--secondary-color);
 }
