@@ -55,7 +55,7 @@ def getLiveData(selectedLiveData = None):
             except:
                 pass    
 
-    allData = [{'id': 1, 'name': 'Distance Measurement', 'value': 1}, {'id': 2, 'name': 'Test2', 'value': 2}, {'id': 3, 'name': 'Test3', 'value': 3}, {'id': 4, 'name': 'Test4', 'value': 4}]
+    allData = [{'id': 1, 'name': 'Water Level', 'value': 1}, {'id': 2, 'name': 'Test2', 'value': 2}, {'id': 3, 'name': 'Test3', 'value': 3}, {'id': 4, 'name': 'Test4', 'value': 4}]
 
     liveData = None
     for data in allData:
@@ -67,48 +67,21 @@ def getLiveData(selectedLiveData = None):
         return jsonify(liveData)
     else:
         return 'Error: No data loaded'
-    
 
-### Distance Measurement View ###
-@bp.route('/distanceMeasurement', methods=('GET', 'POST'))
-@login_required
-def distanceMeasurement(timeBreak = 0.05, repetitions = 20):
-    if request.method == 'POST':
-        try:
-            if request.form['timeBreak'] != '':
-                timeBreak = request.form['timeBreak']
-        except:
-            pass
-    if request.method == 'POST':
-        try:
-            if request.form['repetitions'] != '':
-                repetitions = request.form['repetitions']
-        except:
-            pass
-
-    #Convert timeBreak to float
-    try:
-        timeBreak = float(timeBreak)
-    except:
-        timeBreak = 0.05
-
-    # Convert repetitions to int
-    try:
-        repetitions = int(repetitions)
-    except:
-        repetitions = 10
-
+def measureDistance(timeBreak = 0.6, repetitions =2):
     distanceSum = 0
     for i in range(0, repetitions):
         # Execute the distance measurement via the Raspberry Pi GPIO and the ultrasonic sensor
+        # returnPackage = getDistanceFromSonic_high_priority()
         returnPackage = getDistanceFromSonic()
-        if returnPackage['error'] != None:
-            flash(returnPackage['error'])  
-            return dashBoardViewer()
-        else:
+        print(returnPackage)
+        if ['error'] != None:
             distanceSum += returnPackage['data']
+        else:
+            flash("Error while measuring the distance: " + returnPackage['error'], 'error')
+            return dashBoardViewer()
         # Add the time break to prevent the sensor from being triggered too often
-        if timeBreak > 0:
+        if timeBreak > 0: # WARNING: Schwebung Möglich --> Störgröße
             time.sleep(timeBreak)
     
     # Calculate the average distance
@@ -116,8 +89,40 @@ def distanceMeasurement(timeBreak = 0.05, repetitions = 20):
     # Round the distance
     distance = round(distance, 2)
 
-    logTextToCSV('Distance: ' + str(distance) + ' mm')
-    return jsonify(distance)
+    return distance
+    
+### Enpoint: Set the Zero Water Level Distance ###
+@bp.route('/setZeroWaterLevelDistance', methods=('GET', 'POST'))
+@login_required
+def setZeroWaterLevelDistance():
+    zeroWaterLevelDistance = measureDistance()
+        
+    if zeroWaterLevelDistance:
+        session['zeroWaterLevelDistance'] = zeroWaterLevelDistance
+        return jsonify(zeroWaterLevelDistance)
+    else:
+        flash("Could not set zeroWaterLevelDistance", 'error')
+        return dashBoardViewer()    
+
+### Distance Measurement View ###
+@bp.route('/measureWaterLevel', methods=('GET', 'POST'))
+@login_required
+def measureWaterLevel():
+
+    distance = measureDistance()
+
+    # Check if the zeroWaterLevelDistance is set in session, if not use the current distance as zeroWaterLevelDistance
+    if 'zeroWaterLevelDistance' not in session:
+        session['zeroWaterLevelDistance'] = distance
+
+    # Calculate the water level based on the zeroWaterLevelDistance
+    # waterLevel = session['zeroWaterLevelDistance'] - distance
+    waterLevel = distance
+    # Round the water level
+    waterLevel = round(waterLevel, 2)
+
+    logTextToCSV(str(waterLevel))
+    return jsonify(waterLevel)
 
 
 ### Git Sync View ###

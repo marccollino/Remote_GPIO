@@ -16,6 +16,7 @@ def main():
     try:
         setup_gpio()
         while not stop_event.is_set():
+            time.sleep(1)
             pass
     except Exception as e:
         print(f"An error occurred: {e}")

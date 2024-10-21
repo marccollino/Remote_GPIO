@@ -75,24 +75,55 @@
               measuredValueElement.innerHTML = "<ion-icon name='hourglass-outline'></ion-icon>";
               // Disable the button
               buttonStart.disabled = true;
+              //Hide the button
+              buttonStart.style.display = "none";
               // AJAX Request to start the measurement and write the response in the listElementContent
               var xhr = new XMLHttpRequest();
-              xhr.open('POST', "{{ url_for('home.distanceMeasurement') }}", true);
+              xhr.open('POST', "{{ url_for('home.measureWaterLevel') }}", true);
               // Prepare FormData
               var formData = new FormData();
               // Define the reaction on the server response
               xhr.onload = function() {
                 if (xhr.status === 200) {
-                  var distance = JSON.parse(xhr.responseText);
-                  measuredValueElement.innerHTML = distance + " mm";
+                  var waterLevel = JSON.parse(xhr.responseText);
+                  measuredValueElement.innerHTML = waterLevel + " mm";
                   // Enable the button
                   buttonStart.disabled = false;
+                  // Show the button
+                  buttonStart.style.display = "block";
                 }
               }
               // Send the request with formData
               xhr.send(formData);
 
             });
+
+            // Add a button to reset the zeroWaterLevelDistance
+            var buttonReset = document.createElement("button");
+            buttonReset.className = "button";
+            buttonReset.innerHTML = '<ion-icon name="chevron-collapse-outline"></ion-icon> Set Zero Level';
+            buttonReset.id = "buttonReset_" + liveDataRow['id'];
+            buttonReset.classList.add("action");
+            listElementAction.appendChild(buttonReset);
+            buttonReset.addEventListener('click', function(event) {
+              buttonReset.disabled = true;
+              buttonReset.innerHTML = '<ion-icon name="hourglass-outline"></ion-icon>';
+              // AJAX Request to reset the zeroWaterLevelDistance and write the response in the Button Text
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', "{{ url_for('home.setZeroWaterLevelDistance') }}", true);
+              // Prepare FormData
+              var formData = new FormData();
+              // Define the reaction on the server response
+              xhr.onload = function() {
+                if (xhr.status === 200) {
+                  buttonReset.disabled = false;
+                  buttonReset.innerHTML = '<ion-icon name="chevron-collapse-outline"></ion-icon> Set Zero Level (Currently: ' + xhr.responseText + ' mm)';
+                }
+              }
+              // Send the request with formData
+              xhr.send(formData);
+            });
+
           }
         }
       }
