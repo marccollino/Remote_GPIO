@@ -6,7 +6,7 @@ from webserver_module.auth import login_required
 from webserver_module.helpFunctions import clearSessionKeepUser
 from main import shutdown_raspi, restart_raspi
 
-from GPIO_module.GPIOs import getDistanceFromSonic
+from GPIO_module.GPIOs import getDistanceFromSonic, setup_gpio, cleanup_gpio
 from Git_module.controlGit import pullFromGit
 from saveData_module.saveData import logTextToCSV
 
@@ -68,18 +68,21 @@ def getLiveData(selectedLiveData = None):
     else:
         return 'Error: No data loaded'
 
-def measureDistance(temperatureEnvironment = 24, timeBreak = 0.2, repetitions =30):
+def measureDistance(temperatureEnvironment = 24, timeBreak = 0.5, repetitions = 10):
     ultraSonicVelocity_0C = 331300 # mm/s
     ultraSonicVelocity_increase_1C = 600 # mm/s
     sonicVelocity = ultraSonicVelocity_0C + (temperatureEnvironment * ultraSonicVelocity_increase_1C)
-    distanceSum = 0
+    distanceArray = []
+
+    cleanup_gpio()
+    setup_gpio()
+
     for i in range(0, repetitions):
         # Execute the distance measurement via the Raspberry Pi GPIO and the ultrasonic sensor
         # returnPackage = getDistanceFromSonic_high_priority()
         returnPackage = getDistanceFromSonic(sonicVelocity)
         if ['error'] != None:
-            #print(returnPackage['duration'])
-            distanceSum += returnPackage['distance']
+            distanceArray.append(returnPackage['distance'])
         else:
             flash("Error while measuring the distance: " + returnPackage['error'], 'error')
             return dashBoardViewer()
@@ -88,11 +91,18 @@ def measureDistance(temperatureEnvironment = 24, timeBreak = 0.2, repetitions =3
             time.sleep(timeBreak)
     
     # Calculate the average distance
-    distance = distanceSum / repetitions
-    # Round the distance
-    distance = round(distance, 2)
+    averageDistance = sum(distanceArray) / len(distanceArray)
+    print('averageDistance: ', averageDistance)
+    # Delete all runaways, that are not in the range of +- 5mm from the average distance
+    distanceArray = [distance for distance in distanceArray if distance > averageDistance - 5 and distance < averageDistance + 5]
+    # Calculate the average distance again
+    finalDistance = sum(distanceArray) / len(distanceArray)
 
-    return distance
+    # Round the distance
+    finalDistance = round(finalDistance, 2)
+    print('finalDistance: ', finalDistance)
+
+    return finalDistance
     
 ### Enpoint: Set the Zero Water Level Distance ###
 @bp.route('/setZeroWaterLevelDistance', methods=('GET', 'POST'))

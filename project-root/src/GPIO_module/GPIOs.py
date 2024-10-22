@@ -8,27 +8,25 @@ ULTRASONIC_ECHO_PIN = 24
 duration = 0
 startTime = 0
 stopTime = 0
-edgecount = 0
 
 pi = None
-cb = None
+callBack_1 = None
+callBack_2 = None
 
 # # Disable warnings regarding GPIO usage
 # GPIO.setwarnings(False)
 
-def edge_detected_callback(gpio, level, tick):
-    global startTime, stopTime, edgecount, duration 
+def rising_edge_callback(gpio, level, tick):
+    global startTime
+    startTime = tick
 
-    if edgecount == 0:
-        startTime = tick # microseconds
-        edgecount += 1
-    elif edgecount == 1:
-        stopTime = tick
-        duration = stopTime - startTime
-        edgecount = 0  # Reset edgecount for the next measurement
+def falling_edge_callback(gpio, level, tick):
+    global stopTime, duration, startTime
+    stopTime = tick
+    duration = stopTime - startTime
 
 def setup_gpio():
-    global pi, cb
+    global pi, callBack_1, callBack_2
     # Initialize Pigpio
     pi = pigpio.pi()
 
@@ -38,11 +36,13 @@ def setup_gpio():
     # Set up the ultrasonic sensor pins
     pi.set_mode(ULTRASONIC_TRIGGER_PIN, pigpio.OUTPUT)
     pi.set_mode(ULTRASONIC_ECHO_PIN, pigpio.INPUT)
-    cb = pi.callback(ULTRASONIC_ECHO_PIN, pigpio.EITHER_EDGE, edge_detected_callback)
+    callBack_1 = pi.callback(ULTRASONIC_ECHO_PIN, pigpio.RISING_EDGE, rising_edge_callback)
+    callBack_2 = pi.callback(ULTRASONIC_ECHO_PIN, pigpio.FALLING_EDGE, falling_edge_callback)
 
 def cleanup_gpio():
-    global pi, cb
-    cb.cancel()
+    global pi, callBack_1, callBack_2
+    callBack_1.cancel()
+    callBack_2.cancel()
     pi.stop()
 
 def getDistanceFromSonic(sonicVelocity):
@@ -70,7 +70,6 @@ def getDistanceFromSonic(sonicVelocity):
 
         # Convert the duration to seconds
         duration = duration / 1000000  # seconds
-        edgecount = 0
     
         # mit der Schallgeschwindigkeit (343200 mm/s) multiplizieren
         # und durch 2 teilen, da hin und zurueck
