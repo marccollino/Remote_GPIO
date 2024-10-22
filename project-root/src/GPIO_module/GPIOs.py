@@ -5,10 +5,6 @@ import pigpio # The pigpio library is written in the C programming language.The 
 ULTRASONIC_TRIGGER_PIN = 23
 ULTRASONIC_ECHO_PIN = 24
 
-temperatureEnvironment = 24 # Celsius
-ultraSonicVelocity_0C = 331300 # mm/s
-ultraSonicVelocity_increase_1C = 600 # mm/s
-
 duration = 0
 startTime = 0
 stopTime = 0
@@ -49,9 +45,11 @@ def cleanup_gpio():
     cb.cancel()
     pi.stop()
 
-def getDistanceFromSonic():
+def getDistanceFromSonic(sonicVelocity):
     global duration
     global edgecount
+    duration = 0
+    distance = 0
     try:
         # Set trigger to False (Low)
         pi.write(ULTRASONIC_TRIGGER_PIN, 0)
@@ -76,14 +74,10 @@ def getDistanceFromSonic():
     
         # mit der Schallgeschwindigkeit (343200 mm/s) multiplizieren
         # und durch 2 teilen, da hin und zurueck
-        distance = (duration * (ultraSonicVelocity_0C + (temperatureEnvironment * ultraSonicVelocity_increase_1C))) / 2
+        distance = (duration * sonicVelocity) / 2
         #Round the distance to 2 decimal places
         distance = round(distance, 2)
-        returnPackage['distance'] = distance
-        duration = 0
-        distance = 0
-
-        print(returnPackage)
+        returnPackage['distance'] = distance        
 
     except Exception as e:
         returnPackage['error'] = f"An error occurred: {e}"

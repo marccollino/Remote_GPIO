@@ -68,14 +68,17 @@ def getLiveData(selectedLiveData = None):
     else:
         return 'Error: No data loaded'
 
-def measureDistance(timeBreak = 0.1, repetitions =1):
+def measureDistance(temperatureEnvironment = 24, timeBreak = 0.2, repetitions =30):
+    ultraSonicVelocity_0C = 331300 # mm/s
+    ultraSonicVelocity_increase_1C = 600 # mm/s
+    sonicVelocity = ultraSonicVelocity_0C + (temperatureEnvironment * ultraSonicVelocity_increase_1C)
     distanceSum = 0
     for i in range(0, repetitions):
         # Execute the distance measurement via the Raspberry Pi GPIO and the ultrasonic sensor
         # returnPackage = getDistanceFromSonic_high_priority()
-        returnPackage = getDistanceFromSonic()
+        returnPackage = getDistanceFromSonic(sonicVelocity)
         if ['error'] != None:
-            logTextToCSV('Duration:' + str(returnPackage['duration']))
+            #print(returnPackage['duration'])
             distanceSum += returnPackage['distance']
         else:
             flash("Error while measuring the distance: " + returnPackage['error'], 'error')
@@ -95,7 +98,8 @@ def measureDistance(timeBreak = 0.1, repetitions =1):
 @bp.route('/setZeroWaterLevelDistance', methods=('GET', 'POST'))
 @login_required
 def setZeroWaterLevelDistance():
-    zeroWaterLevelDistance = measureDistance()
+    temperatureEnvironment = 24
+    zeroWaterLevelDistance = measureDistance(temperatureEnvironment)
         
     if zeroWaterLevelDistance:
         session['zeroWaterLevelDistance'] = zeroWaterLevelDistance
@@ -108,16 +112,16 @@ def setZeroWaterLevelDistance():
 @bp.route('/measureWaterLevel', methods=('GET', 'POST'))
 @login_required
 def measureWaterLevel():
-
-    distance = measureDistance()
+    temperatureEnvironment = 24
+    distance = measureDistance(temperatureEnvironment)
 
     # Check if the zeroWaterLevelDistance is set in session, if not use the current distance as zeroWaterLevelDistance
     if 'zeroWaterLevelDistance' not in session:
         session['zeroWaterLevelDistance'] = distance
 
     # Calculate the water level based on the zeroWaterLevelDistance
-    # waterLevel = session['zeroWaterLevelDistance'] - distance
-    waterLevel = distance
+    waterLevel = session['zeroWaterLevelDistance'] - distance
+    # waterLevel = distance
     # Round the water level
     waterLevel = round(waterLevel, 2)
 
