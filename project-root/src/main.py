@@ -1,7 +1,6 @@
-from GPIO_module.GPIOs import setup_gpio
+from GPIO_module.GPIOs import setup_gpio, cleanup_gpio
 from webserver_module import create_app
 
-import RPi.GPIO as GPIO
 import threading
 import signal
 import time
@@ -23,7 +22,7 @@ def main():
     except KeyboardInterrupt:
         print("Shutting down server...")
     finally:
-        GPIO.cleanup()
+        cleanup_gpio()
         print("Server and GPIO setup stopped.")
         
         # sys.exit(0)
@@ -57,7 +56,7 @@ def restart_raspi():
     except Exception as e:
         return f"An error occurred while restarting: {e}"
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # This is the entry point of the application. The __name__ variable will be set to "__main__" when the script is executed directly.
     try:
         # The signal.signal function is used to register the signal_handler for SIGINT and SIGTERM signals.
         signal.signal(signal.SIGINT, signal_handler)
@@ -75,7 +74,7 @@ if __name__ == "__main__":
     try:
         # create and run the webserver
         app = create_app()
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        app.run(host='0.0.0.0', port=5000)  # debug=True results in the lgpio.error: 'GPIO not allocated'
     except Exception as e:
         print(f"An error occurred while setting up the server: {e}")
     finally:

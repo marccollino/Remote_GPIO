@@ -68,15 +68,15 @@ def getLiveData(selectedLiveData = None):
     else:
         return 'Error: No data loaded'
 
-def measureDistance(timeBreak = 0.6, repetitions =2):
+def measureDistance(timeBreak = 0.1, repetitions =1):
     distanceSum = 0
     for i in range(0, repetitions):
         # Execute the distance measurement via the Raspberry Pi GPIO and the ultrasonic sensor
         # returnPackage = getDistanceFromSonic_high_priority()
         returnPackage = getDistanceFromSonic()
-        print(returnPackage)
         if ['error'] != None:
-            distanceSum += returnPackage['data']
+            logTextToCSV('Duration:' + str(returnPackage['duration']))
+            distanceSum += returnPackage['distance']
         else:
             flash("Error while measuring the distance: " + returnPackage['error'], 'error')
             return dashBoardViewer()
