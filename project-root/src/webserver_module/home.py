@@ -89,18 +89,22 @@ def measureDistance(temperatureEnvironment = 24, timeBreak = 0.5, repetitions = 
         # Add the time break to prevent the sensor from being triggered too often
         if timeBreak > 0: # WARNING: Schwebung Möglich --> Störgröße
             time.sleep(timeBreak)
-    
-    # Calculate the average distance
-    averageDistance = sum(distanceArray) / len(distanceArray)
-    print('averageDistance: ', averageDistance)
-    # Delete all runaways, that are not in the range of +- 5mm from the average distance
-    distanceArray = [distance for distance in distanceArray if distance > averageDistance - 5 and distance < averageDistance + 5]
-    # Calculate the average distance again
-    finalDistance = sum(distanceArray) / len(distanceArray)
+    try:
+        print('distanceArray: ', distanceArray)
+        # Calculate the average distance
+        averageDistance = sum(distanceArray) / len(distanceArray)
+        print('averageDistance: ', averageDistance)
+        # Delete all runaways, that are not in the range of +- 5mm from the average distance
+        distanceArray = [distance for distance in distanceArray if distance > averageDistance - 5 and distance < averageDistance + 5]
+        # Calculate the average distance again
+        finalDistance = sum(distanceArray) / len(distanceArray)
 
-    # Round the distance
-    finalDistance = round(finalDistance, 2)
-    print('finalDistance: ', finalDistance)
+        # Round the distance
+        finalDistance = round(finalDistance, 2)
+        print('finalDistance: ', finalDistance)
+    except Exception as e:
+        flash("Error while calculating the distance: " + str(e), 'error')
+        return dashBoardViewer()
 
     return finalDistance
     
@@ -112,8 +116,12 @@ def setZeroWaterLevelDistance():
     zeroWaterLevelDistance = measureDistance(temperatureEnvironment)
         
     if zeroWaterLevelDistance:
-        session['zeroWaterLevelDistance'] = zeroWaterLevelDistance
-        return jsonify(zeroWaterLevelDistance)
+        try:
+            session['zeroWaterLevelDistance'] = float(zeroWaterLevelDistance)
+            return jsonify(zeroWaterLevelDistance)
+        except:
+            flash("Could not set zeroWaterLevelDistance", 'error')
+            return dashBoardViewer()
     else:
         flash("Could not set zeroWaterLevelDistance", 'error')
         return dashBoardViewer()    
@@ -127,7 +135,11 @@ def measureWaterLevel():
 
     # Check if the zeroWaterLevelDistance is set in session, if not use the current distance as zeroWaterLevelDistance
     if 'zeroWaterLevelDistance' not in session:
-        session['zeroWaterLevelDistance'] = distance
+        try:
+            session['zeroWaterLevelDistance'] = float(distance)
+        except:
+            flash("Could not set zeroWaterLevelDistance", 'error')
+            return dashBoardViewer()
 
     # Calculate the water level based on the zeroWaterLevelDistance
     waterLevel = session['zeroWaterLevelDistance'] - distance
